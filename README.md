@@ -26,6 +26,14 @@ a simple django drf api with celery worker to generate text to image using stabi
 - sudo docker-compose up --build
 
 
+## test user creds
+- username: test, password: test12
+
+## all generated photos are in api/uploads
+
+## all generated photo's url is stored in Request Model associated with User(test creds)
+
+
 ## Routes
 - /login POST
     Request Body:   {"username":"username","password":"password"}
