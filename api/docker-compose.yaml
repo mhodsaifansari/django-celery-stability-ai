@@ -1,0 +1,38 @@
+version: "3"
+services:
+    server:
+        restart: unless-stopped
+        build: .
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes: # <-here
+            - .:/app 
+        ports:
+          - '8000:8000'
+          
+        environment:
+            DEBUG: "True"
+            DJANGO_SECERT: ${DJANGO_SECERT}
+            API_KEY: ${API_KEY}
+            CELERY_BROKER_URL: "redis://redis:6379/0"
+            CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+        depends_on:
+            - worker
+    worker:
+        restart: unless-stopped
+        build: .
+        volumes: # <-here
+            - .:/app 
+        command: celery -A api worker --loglevel=DEBUG --concurrency 5 
+        environment:
+            DEBUG: "True"
+            DJANGO_SECERT: ${DJANGO_SECERT}
+            API_KEY: ${API_KEY}
+            CELERY_BROKER_URL: "redis://redis:6379/0"
+            CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+        depends_on:
+            - redis
+    redis:
+        restart: unless-stopped
+        image: redis:latest
+        expose:
+            - 6379
